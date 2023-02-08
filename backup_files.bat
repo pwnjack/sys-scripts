@@ -4,7 +4,7 @@ rem Set the folder to be backed up
 set folder="C:\Program Files (x86)\PrivateArk"
 
 rem Set the passphrase for encrypting the archive
-set passphrase=INSERT-PASSPHRASE-HERE
+set passphrase="INSERT-PASSPHRASE-HERE"
 
 rem Set the name of the archive file, including the hostname and timestamp
 set hostname=%COMPUTERNAME%
