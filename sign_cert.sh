@@ -43,8 +43,6 @@ fileName=$(echo "${c}" | sed 's/\.[^.]*$//')
 
 openssl x509 -req -in "${c}" -CA rootCA/rootCA.crt -CAkey rootCA/rootCA.key -CAserial rootCA/rootCA.srl -days 730 -sha256 -out "${fileName}.crt" -extensions req_ext -extfile ${CERT_CONFIG}
 
-#openssl x509 -text -noout -in $fileName.crt | grep "DNS"
-
 read -r -p "Want to see the signed certificate (.crt) content? (y/n)" choicesee
 case "$choicesee" in
   y|Y ) echo "yes" && openssl x509 -text -noout -in "${fileName}.crt";;

@@ -8,7 +8,7 @@ randompw=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c16)
 echo "Creating ${user_name} user..."
 sudo adduser ${user_name}
 sudo usermod -aG wheel ${user_name}
-echo ${randompw} | sudo -S passwd --stdin ${user_name}
+echo "${randompw}" | sudo -S passwd --stdin ${user_name}
 echo "Random password for user ${user_name} set as: ${randompw}"
 sudo -i -u ${user_name} bash << EOF
 echo "Configuring key..."
