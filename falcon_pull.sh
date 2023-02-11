@@ -19,7 +19,7 @@ get_bearer_token() {
 # Function to retrieve the host IDs
 get_host_ids() {
     local bearer_token=$1
-    local response=$(curl -X GET "https://api.eu-1.crowdstrike.com/devices/queries/devices/v1" \
+    local response=$(curl -X GET "https://api.eu-1.crowdstrike.com/devices/queries/devices/v1?limit=5000" \
         -H "Authorization: Bearer ${bearer_token}")
 
     local host_ids=$(echo $response | jq -r '.resources[]')
@@ -47,11 +47,11 @@ bearer_token=$(get_bearer_token)
 host_ids=$(get_host_ids $bearer_token)
 host_details=$(get_host_details $bearer_token "$host_ids")
 
-echo -----
-echo $host_ids
-echo -----
-echo $host_details
-echo -----
+# echo -----
+# echo $host_ids
+# echo -----
+# echo $host_details
+# echo -----
 
 # Write the host details to a CSV file
 echo "Host ID,Host Name,Operating System,IP Address" > host_details.csv
