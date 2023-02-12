@@ -32,26 +32,18 @@ get_host_details() {
     local host_ids=$2
     local host_details=""
 
-    for host_id in $host_ids; do
-        local response=$(curl -X POST "https://api.eu-1.crowdstrike.com/devices/entities/devices/v2" \
-            -H "Authorization: Bearer ${bearer_token}" \
-            -H "Content-Type: application/json" \
-            -d "{\"ids\":[\"$host_id\"]}")
+    local response=$(curl -X POST "https://api.eu-1.crowdstrike.com/devices/entities/devices/v2" \
+        -H "Authorization: Bearer ${bearer_token}" \
+        -H "Content-Type: application/json" \
+        -d "{\"ids\":[$host_ids]}")
 
-        host_details="$host_details$(echo $response | jq -r '.resources[0]')\n"
-    done
-    echo -e $host_details
+    host_details=$(echo $response | jq -r '.resources[]')
+    echo $host_details
 }
 
 bearer_token=$(get_bearer_token)
 host_ids=$(get_host_ids $bearer_token)
 host_details=$(get_host_details $bearer_token "$host_ids")
-
-# echo -----
-# echo $host_ids
-# echo -----
-# echo $host_details
-# echo -----
 
 # Write the host details to a CSV file
 echo "Host ID,Host Name,Operating System,IP Address" > host_details.csv
