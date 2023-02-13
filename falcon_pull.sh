@@ -4,6 +4,8 @@
 client_id="CLIENT_ID"
 client_secret="CLIENT_SECRET"
 
+timestamp=$(date +%Y%m%d_%H%M%S)
+
 # Function to obtain the bearer token
 get_bearer_token() {
     local response=$(curl -X POST "https://api.eu-1.crowdstrike.com/oauth2/token" \
@@ -46,11 +48,11 @@ host_ids=$(get_host_ids $bearer_token)
 host_details=$(get_host_details $bearer_token "$host_ids")
 
 # Write the host details to a CSV file
-echo "Host ID,Host Name,Operating System,IP Address" > host_details.csv
+echo "Host ID,Host Name,Operating System,IP Address" > host_details_${timestamp}.csv
 while read -r line; do
     host_id=$(echo $line | jq -r '.device_id')
     host_name=$(echo $line | jq -r '.hostname')
     os=$(echo $line | jq -r '.os_version')
     ip_address=$(echo $line | jq -r '.local_ip')
-    echo "$host_id,$host_name,$os,$ip_address" >> host_details.csv
+    echo "$host_id,$host_name,$os,$ip_address" >> host_details_${timestamp}.csv
 done <<< "$host_details"
