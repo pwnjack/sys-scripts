@@ -48,11 +48,15 @@ host_ids=$(get_host_ids $bearer_token)
 host_details=$(get_host_details $bearer_token "$host_ids")
 
 # Write the host details to a CSV file
-echo "Host ID,Host Name,Operating System,IP Address" > host_details_${timestamp}.csv
+echo "Host ID,Host Name,Operating System,Kernel Version,Local IP, External IP, Mac Address, Machine Domain" > host_details_${timestamp}.csv
 while read -r line; do
-    host_id=$(echo $line | jq -r '.device_id')
+    device_id=$(echo $line | jq -r '.device_id')
     host_name=$(echo $line | jq -r '.hostname')
     os=$(echo $line | jq -r '.os_version')
-    ip_address=$(echo $line | jq -r '.local_ip')
-    echo "$host_id,$host_name,$os,$ip_address" >> host_details_${timestamp}.csv
+    kernel_version=$(echo $line | jq -r '.kernel_version')
+    local_ip=$(echo $line | jq -r '.local_ip')
+    external_ip=$(echo $line | jq -r '.external_ip')
+    mac_address=$(echo $line | jq -r '.mac_address')
+    machine_domain=$(echo $line | jq -r '.machine_domain')
+    echo "$device_id,$host_name,$os,$kernel_version,$local_ip,$external_ip,$mac_address,$machine_domain" >> host_details_${timestamp}.csv
 done <<< "$host_details"
