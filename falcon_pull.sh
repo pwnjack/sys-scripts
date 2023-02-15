@@ -4,7 +4,7 @@
 client_id="CLIENT_ID"
 client_secret="CLIENT_SECRET"
 
-timestamp=$(date +%Y%m%d_%H%M%S)
+timestamp=$(date +%Y%m%d)
 
 # Function to obtain the bearer token
 get_bearer_token() {
@@ -33,14 +33,20 @@ get_host_details() {
     local bearer_token=$1
     local host_ids=$2
     local host_details=""
+    local host_ids_array=(${host_ids[0]})
+    
+    joined=$(printf ", \"%s\"" "${host_ids_array[@]}")
 
     local response=$(curl -X POST "https://api.eu-1.crowdstrike.com/devices/entities/devices/v2" \
         -H "Authorization: Bearer ${bearer_token}" \
         -H "Content-Type: application/json" \
-        -d "{\"ids\":[$host_ids]}")
+        -d "{\"ids\":[${joined:1}]}")
+    n_host=${#host_ids_array[@]}
+    for (( ir=0; ir<${n_host}; ir++ )); do
+        host_details="$host_details$(echo $response | jq -r --argjson index $ir '.resources[$index]')\n"
+    done
 
-    host_details=$(echo $response | jq -r '.resources[]')
-    echo $host_details
+    echo -e $host_details
 }
 
 bearer_token=$(get_bearer_token)
