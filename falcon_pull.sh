@@ -41,7 +41,9 @@ get_host_details() {
         -H "Authorization: Bearer ${bearer_token}" \
         -H "Content-Type: application/json" \
         -d "{\"ids\":[${joined:1}]}")
+    
     n_host=${#host_ids_array[@]}
+    
     for (( ir=0; ir<${n_host}; ir++ )); do
         host_details="$host_details$(echo $response | jq -r --argjson index $ir '.resources[$index]')\n"
     done
