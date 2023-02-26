@@ -1,42 +1,44 @@
-# Remote Backup Script
-This is a bash script for backing up a specified directory on multiple remote hosts. The script uses rsync to transfer the backup data to the local host, compresses and encrypts the backup data with tar and gpg, and stores the encrypted backup file on the local host.
+# SSH Backup Script
+This bash script performs a backup of specified directories from remote hosts via SSH. It uses rsync to copy the specified directory from each remote host to a local directory named "backups", compresses the backup directory, and encrypts it using gpg with a passphrase specified in the script.
+
+## Prerequisites
+- A Unix-like operating system (Linux, macOS, etc.)
+rsync and gpg installed on the local machine
+- SSH access to the remote hosts and the ability to execute commands on them
+- A list of remote hosts and directories to back up in the format ssh_connection_string source_directory, one entry per line in a file named hosts.txt
+- Optionally, a list of files or directories to exclude from the backup, one entry per line in a file named exclude-list.txt
 
 ## Usage
-Clone the repository to your local machine:
+Modify the following variables in the script to fit your needs:
 
-        git clone https://github.com/yourusername/remote-backup-script.git
+-  HOSTS_FILE: The path to the file containing the list of remote hosts and directories to back up. By default, this is set to "hosts.txt".
 
-Modify the hosts.txt file to specify the list of remote hosts and directories to back up. The format of each line in the file should be:
+Example:
 
-        user@hostname:/path/to/directory
+        user@remotehost1:/path/to/dir1
+        user@remotehost2:/path/to/dir2
 
-where user is the username to use for the SSH connection, hostname is the hostname or IP address of the remote host, and /path/to/directory is the path to the directory on the remote host to back up.
+- PASSPHRASE: The passphrase to use for encrypting the backup files. By default, this is set to "mysecretpassphrase".
+- EXCLUDE_FILE: The path to the file containing the list of files or directories to exclude from the backup. By default, this is set to "exclude-list.txt".
 
-(Optional) Modify the exclude-list.txt file to specify a list of files or directories to exclude from the backup. Each line in the file should be a relative path to the file or directory to exclude, e.g.:
+Example:
 
-        tmp/
-        .DS_Store
+        *.log
+        temp/
 
-(Optional) Modify the PASSPHRASE variable in the script to specify a passphrase to use for encrypting the backup.
+You can also modify the rsync options to suit your needs. By default, the script uses the options -av --delete to archive and synchronize the remote directory to the local machine, and --exclude-from="${EXCLUDE_FILE}" to exclude files and directories listed in the exclude-list.txt file.
 
-Run the script:
+Run the script from the command line:
 
-        ./backup.sh
+        bash backup.sh
 
-The script will create a timestamped backup file for each host in the backups directory.
+The script will loop through each remote host specified in hosts.txt, back up the specified directory to a local directory named "backups", compress and encrypt the backup, and save the encrypted backup file in a subdirectory of the "backups" directory named after the hostname of the remote host.
 
-## Restoring a Backup
+To restore a backup, copy the encrypted backup file to the remote host and run the following command:
 
-To restore a backup, follow these steps:
+        gpg --batch --decrypt --passphrase <PASSPHRASE> <backup_file> | tar -xz -C </destination/directory/>
 
-Copy the encrypted backup file(s) for the desired host(s) to the remote host where you want to restore the backup.
 
-Concatenate the backup chunks together using the cat command, decrypt the concatenated backup using gpg, and extract the contents of the backup using tar. For example:
+## File Structure
 
-        cat backups/hostname/backup-file.tar.gz.gpg.* | gpg --batch --passphrase mysecretpassphrase -d | tar -xzvf -
-
-Replace hostname with the name of the remote host where the backup was taken, and backup-file.tar.gz.gpg with the name of the encrypted backup file.
-
-## License
-
-This script is released under the MIT License.
+The script assumes that there is a directory named "backups" in the same directory as the script. The backups will be saved in subdirectories of the "backups" directory named after the hostname of the remote host being backed up. For example, if the backup script is run for a remote host with the hostname "remotehost1", the backup files will be saved in "backups/remotehost1/". If the "backups" directory does not exist, it will be created automatically.
