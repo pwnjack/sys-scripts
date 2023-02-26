@@ -1,0 +1,2 @@
+user@remotehost1:/path/to/dir1
+user@remotehost2:/path/to/dir2
